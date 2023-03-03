@@ -37,8 +37,7 @@ class LinearRegression:
             self.bias -= self.lr * db
 
     def predict(self, X):
-        y_approx = np.dot(X, self.weights) + self.bias
-        return y_approx
+        return np.dot(X, self.weights) + self.bias
 
 
 # Test the implementation

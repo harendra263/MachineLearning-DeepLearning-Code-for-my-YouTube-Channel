@@ -66,5 +66,4 @@ class Critic(nn.Module):
 
     def forward(self, img):
         img_flat = img.view(img.shape[0], -1)
-        validity = self.model(img_flat)
-        return validity
+        return self.model(img_flat)

@@ -47,15 +47,13 @@ def generate_clusters(
         )
     ).fit_transform(message_embeddings)
 
-    clusters = hdbscan.HDBSCAN(
+    return hdbscan.HDBSCAN(
         min_cluster_size=min_cluster_size,
         min_samples=min_samples,
         metric="euclidean",
         gen_min_span_tree=True,
         cluster_selection_method="eom",
     ).fit(umap_embeddings)
-
-    return clusters
 
 
 ## Hyperopt

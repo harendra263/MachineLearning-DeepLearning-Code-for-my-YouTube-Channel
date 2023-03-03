@@ -15,7 +15,7 @@ def mean_iou(predicted_label, label, eps=1e-10, num_classes=10):
         label = label.contiguous().view(-1)
 
         iou_single_class = []
-        for class_number in range(0, num_classes):
+        for class_number in range(num_classes):
             true_predicted_class = predicted_label == class_number
             true_label = label == class_number
 
@@ -65,14 +65,10 @@ def meanIoU(target, predicted):
         intersection = np.logical_and(target_arr, predicted_arr).sum()
         union = np.logical_or(target_arr, predicted_arr).sum()
 
-        if union == 0:
-            iou_score = 0
-        else:
-            iou_score = intersection / union
+        iou_score = 0 if union == 0 else intersection / union
         iousum += iou_score
 
-    miou = iousum / target.shape[0]
-    return miou
+    return iousum / target.shape[0]
 
 
 #######################################################

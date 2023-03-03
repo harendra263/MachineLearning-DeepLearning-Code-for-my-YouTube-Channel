@@ -33,8 +33,8 @@ class ImageDataset(Dataset):
         self.transform = transforms.Compose(transforms_)
         self.unaligned = unaligned
 
-        self.files_A = sorted(glob.glob(os.path.join(root, "%sA" % mode) + "/*.*"))
-        self.files_B = sorted(glob.glob(os.path.join(root, "%sB" % mode) + "/*.*"))
+        self.files_A = sorted(glob.glob(f'{os.path.join(root, f"{mode}A")}/*.*'))
+        self.files_B = sorted(glob.glob(f'{os.path.join(root, f"{mode}B")}/*.*'))
         # print("self.files_B ", self.files_B)
         """ Will print below array with all file names
         ['/content/drive/MyDrive/All_Datasets/summer2winter_yosemite/trainB/2005-06-26 14:04:52.jpg',
@@ -104,17 +104,15 @@ class ReplayBuffer:
             if len(self.data) < self.max_size:
                 self.data.append(element)
                 to_return.append(element)
+            elif random.uniform(0, 1) > 0.5:
+                i = random.randint(0, self.max_size - 1)
+                to_return.append(self.data[i].clone())
+                self.data[
+                    i
+                ] = element  # replaces the older image with the newly generated image.
             else:
-                # Returns newly added image with a probability of 0.5.
-                if random.uniform(0, 1) > 0.5:
-                    i = random.randint(0, self.max_size - 1)
-                    to_return.append(self.data[i].clone())
-                    self.data[
-                        i
-                    ] = element  # replaces the older image with the newly generated image.
-                else:
-                    # Otherwise, it sends an older generated image and
-                    to_return.append(element)
+                # Otherwise, it sends an older generated image and
+                to_return.append(element)
         return Variable(torch.cat(to_return))
 
 

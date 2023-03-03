@@ -4,17 +4,14 @@ from math import sqrt
 
 
 def mean(numbers):
-    if len(numbers) > 0:
-        return sum(numbers) / len(numbers)
-    return float('NaN')
+    return sum(numbers) / len(numbers) if len(numbers) > 0 else float('NaN')
 
 
 def std_dev(numbers):
     if len(numbers) > 0:
         avg = mean(numbers)
-        variance = sum([(i - avg) ** 2 for i in numbers]) / len(numbers)
-        standard_deviation = sqrt(variance)
-        return standard_deviation
+        variance = sum((i - avg) ** 2 for i in numbers) / len(numbers)
+        return sqrt(variance)
     return float('NaN')
 
 

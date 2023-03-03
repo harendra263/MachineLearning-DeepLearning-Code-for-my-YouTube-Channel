@@ -18,7 +18,7 @@ Note: You may assume the string contain only lowercase letters.
 
 # 1st Alternative
 def firstUniqChar(s: str) -> int:
-    d = dict()
+    d = {}
     for c in s:
         d[c] = d.get(c, 0) + 1
     print(d)
@@ -26,11 +26,7 @@ def firstUniqChar(s: str) -> int:
     {'l': 1, 'e': 3, 't': 1, 'c': 1, 'o': 1, 'd': 1}
     """
 
-    for i in range(len(s)):
-        if d[s[i]] == 1:
-            return i
-
-    return -1
+    return next((i for i in range(len(s)) if d[s[i]] == 1), -1)
 
 
 # 2nd Alternative

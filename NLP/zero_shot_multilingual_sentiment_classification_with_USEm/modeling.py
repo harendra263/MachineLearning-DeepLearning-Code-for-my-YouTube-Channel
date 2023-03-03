@@ -49,13 +49,10 @@ class Model(pl.LightningModule):
         self.layers = nn.Sequential(*layers)
 
     def forward(self, x):
-        # x will be a batch of USEm vectors
-        logits = self.layers(x)
-        return logits
+        return self.layers(x)
 
     def configure_optimizers(self):
-        optimizer = torch.optim.Adam(self.parameters(), lr=self.learning_rate)  # type: ignore
-        return optimizer
+        return torch.optim.Adam(self.parameters(), lr=self.learning_rate)
 
     def __compute_loss(self, batch):
         x, y = batch["embedding"], batch["label"]

@@ -93,88 +93,92 @@ def train(
 
             running_loss += loss.item()
 
-        else:
-            model.eval()
-            test_loss = 0
-            test_accuracy = 0
-            val_iou_score = 0
+        model.eval()
+        test_loss = 0
+        test_accuracy = 0
+        val_iou_score = 0
 
-            with torch.no_grad():
-                for i, data in enumerate(tqdm(val_loader)):
-                    image_tiles, mask_tiles = data
+        with torch.no_grad():
+            for i, data in enumerate(tqdm(val_loader)):
+                image_tiles, mask_tiles = data
 
-                    if patch:
-                        batch_size, n_tiles, channel, height, width = image_tiles.size()
-                        image_tiles = image_tiles.view(-1, channel, height, width)
-                        mask_tiles = mask_tiles.view(-1, height, width)
+                if patch:
+                    batch_size, n_tiles, channel, height, width = image_tiles.size()
+                    image_tiles = image_tiles.view(-1, channel, height, width)
+                    mask_tiles = mask_tiles.view(-1, height, width)
 
-                    image = image_tiles.to(device)
-                    mask = mask_tiles.to(device)
+                image = image_tiles.to(device)
+                mask = mask_tiles.to(device)
 
-                    # Forward Propagation
-                    predicted_image = model(image)
+                # Forward Propagation
+                predicted_image = model(image)
 
-                    # Metric to do Evaluation
-                    val_iou_score += mean_iou(predicted_image, mask)
-                    test_accuracy += pixel_accuracy(predicted_image, mask)
+                # Metric to do Evaluation
+                val_iou_score += mean_iou(predicted_image, mask)
+                test_accuracy += pixel_accuracy(predicted_image, mask)
 
-                    loss = criterion(predicted_image, mask)
-                    test_loss += loss.item()
+                loss = criterion(predicted_image, mask)
+                test_loss += loss.item()
 
-            # Mean IoU for each batch calculation
-            losses_train.append(running_loss / len(train_loader))
-            losses_test.append(test_loss / len(val_loader))
+        # Mean IoU for each batch calculation
+        losses_train.append(running_loss / len(train_loader))
+        losses_test.append(test_loss / len(val_loader))
 
             # Checking for Loss Decreases
-            if min_loss > (test_loss / len(val_loader)):
-                print(
-                    "Loss Decreasing... {:.3f} >> {:.3f} ".format(
-                        min_loss, (test_loss / len(val_loader))
-                    )
+        if min_loss > (test_loss / len(val_loader)):
+            print(
+                "Loss Decreasing... {:.3f} >> {:.3f} ".format(
+                    min_loss, (test_loss / len(val_loader))
                 )
-                min_loss = test_loss / len(val_loader)
-                decreases += 1
-                if decreases % 5 == 0:
-                    print("Saving Model as loss is decreasing..")
-                    torch.save(
-                        model,
-                        "Inception-v4_mIoU-{:.3f}.pt".format(
-                            val_iou_score / len(val_loader)
-                        ),
-                    )
-
-                # If the Loss is NOT decreasing
-                if (test_loss / len(val_loader)) > min_loss:
-                    min_loss = test_loss / len(val_loader)
-                    print(
-                        f"Loss Not Decreasing for {num_of_times_loss_not_improving} time"
-                    )
-                    if num_of_times_loss_not_improving == 6:
-                        print(
-                            "Loss not decreasing for 6 times, hence stopping Training"
-                        )
-                        break
-
-                # Updating IoU and and Accuracy
-                train_iou.append(iou_score / len(train_loader))
-                train_acc.append(accuracy / len(train_loader))
-                val_iou.append(val_iou_score / len(val_loader))
-                val_acc.append(test_accuracy / len(val_loader))
-
-                print(
-                    "Epoch:{}/{}..".format(epoch + 1, epochs),
-                    "Train Loss:{:.3f}..".format(running_loss / len(train_loader)),
-                    "Validation Loss: {:.3f}..".format(test_loss / len(val_loader)),
-                    "Train mean_iou:{:.3f}..".format(iou_score / len(train_loader)),
-                    "Validation mean_iou: {:.3f}..".format(
+            )
+            min_loss = test_loss / len(val_loader)
+            decreases += 1
+            if decreases % 5 == 0:
+                print("Saving Model as loss is decreasing..")
+                torch.save(
+                    model,
+                    "Inception-v4_mIoU-{:.3f}.pt".format(
                         val_iou_score / len(val_loader)
                     ),
-                    "Train Acc:{:.3f}..".format(accuracy / len(train_loader)),
-                    "Val Acc:{:.3f}..".format(test_accuracy / len(val_loader)),
-                    "Time: {:.2f}m".format((time.time() - start_time) / 60),
                 )
 
-    history = {
+            # If the Loss is NOT decreasing
+            if (test_loss / len(val_loader)) > min_loss:
+                min_loss = test_loss / len(val_loader)
+                print(
+                    f"Loss Not Decreasing for {num_of_times_loss_not_improving} time"
+                )
+                if num_of_times_loss_not_improving == 6:
+                    print(
+                        "Loss not decreasing for 6 times, hence stopping Training"
+                    )
+                    break
+
+            # Updating IoU and and Accuracy
+            train_iou.append(iou_score / len(train_loader))
+            train_acc.append(accuracy / len(train_loader))
+            val_iou.append(val_iou_score / len(val_loader))
+            val_acc.append(test_accuracy / len(val_loader))
+
+            print(
+                f"Epoch:{epoch + 1}/{epochs}..",
+                "Train Loss:{:.3f}..".format(running_loss / len(train_loader)),
+                "Validation Loss: {:.3f}..".format(
+                    test_loss / len(val_loader)
+                ),
+                "Train mean_iou:{:.3f}..".format(
+                    iou_score / len(train_loader)
+                ),
+                "Validation mean_iou: {:.3f}..".format(
+                    val_iou_score / len(val_loader)
+                ),
+                "Train Acc:{:.3f}..".format(accuracy / len(train_loader)),
+                "Val Acc:{:.3f}..".format(test_accuracy / len(val_loader)),
+                "Time: {:.2f}m".format((time.time() - start_time) / 60),
+            )
+
+    print("Total time: {:.2f} m".format((time.time() - fit_time) / 60))
+    return {
         "train_loss": losses_train,
         "val_loss": losses_test,
         "train_miou": train_iou,
@@ -183,5 +187,3 @@ def train(
         "val_acc": val_acc,
         "lrs": lrs,
     }
-    print("Total time: {:.2f} m".format((time.time() - fit_time) / 60))
-    return history

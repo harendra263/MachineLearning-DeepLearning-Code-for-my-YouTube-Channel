@@ -39,8 +39,7 @@ def dice_coefficients_loss(y_true, y_pred, smooth=100):
 def iou(y_true, y_pred, smooth=100):
     intersection = K.sum(y_true * y_pred)
     sum = K.sum(y_true + y_pred)
-    iou = (intersection + smooth) / (sum - intersection + smooth)
-    return iou
+    return (intersection + smooth) / (sum - intersection + smooth)
 
 
 def jaccard_distance(y_true, y_pred):

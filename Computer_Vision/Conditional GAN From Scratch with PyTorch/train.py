@@ -53,7 +53,7 @@ disc_opt = torch.optim.Adam(disc.parameters(), lr=lr)
 
 
 def weights_init(m):
-    if isinstance(m, nn.Conv2d) or isinstance(m, nn.ConvTranspose2d):
+    if isinstance(m, (nn.Conv2d, nn.ConvTranspose2d)):
         torch.nn.init.normal_(m.weight, 0.0, 0.02)
     if isinstance(m, nn.BatchNorm2d):
         torch.nn.init.normal_(m.weight, 0.0, 0.02)
@@ -77,7 +77,7 @@ real_image_and_labels = False
 disc_fake_pred = False
 disc_real_pred = False
 
-for epoch in range(n_epochs):
+for _ in range(n_epochs):
     # Dataloader returns the batches and the labels
     for real, labels in tqdm(dataloader):
         cur_batch_size = len(real)

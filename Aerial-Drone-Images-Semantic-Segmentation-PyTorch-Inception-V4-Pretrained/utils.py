@@ -28,10 +28,8 @@ n_classes = 23
 
 # Return a df containing the image ids
 def get_image_id_df(root_img_path):
-    name = []
     filenames = [f for f in listdir(root_img_path) if isfile(join(root_img_path, f))]
-    for filename in filenames:
-        name.append(filename.split(".")[0])
+    name = [filename.split(".")[0] for filename in filenames]
     return pd.DataFrame({"id": name}, index=np.arange(0, len(name)))
 
 
@@ -54,7 +52,7 @@ def mean_iou(predicted_label, label, eps=1e-10, num_classes=10):
         label = label.contiguous().view(-1)
 
         iou_single_class = []
-        for class_number in range(0, num_classes):
+        for class_number in range(num_classes):
             true_predicted_class = predicted_label == class_number
             true_label = label == class_number
 

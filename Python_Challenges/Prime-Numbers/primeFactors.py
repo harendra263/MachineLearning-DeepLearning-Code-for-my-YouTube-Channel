@@ -10,7 +10,7 @@ def get_prime_factors(number):
 
     while prime_num <= math.sqrt(number):
         while number % prime_num == 0:
-            prime_factors.append(int(prime_num))
+            prime_factors.append(prime_num)
             number /= prime_num
 
         prime_num += 1
