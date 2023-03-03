@@ -20,7 +20,7 @@ import matplotlib.image as mpimg
 from utils import *
 from cyclegan import *
 
-cuda = True if torch.cuda.is_available() else False
+cuda = bool(torch.cuda.is_available())
 print("Using CUDA" if cuda else "Not using CUDA")
 
 """ So generally both torch.Tensor and torch.cuda.Tensor are equivalent. You can do everything you like with them both.
@@ -152,7 +152,7 @@ def save_img_samples(batches_done):
     # Arange images along y-axis
     image_grid = torch.cat((real_A, fake_B, real_B, fake_A), 1)
 
-    path = root_path + "/%s.png" % (batches_done)  # Path when running in Google Colab
+    path = f"{root_path}/{batches_done}.png"
 
     # path =  '/kaggle/working' + "/%s.png" % (batches_done)    # Path when running inside Kaggle
     save_image(image_grid, path, normalize=False)

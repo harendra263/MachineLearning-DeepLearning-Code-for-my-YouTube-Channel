@@ -79,8 +79,7 @@ class Generator(nn.Module):
         )
 
     def forward(self, input):
-        output = self.network(input)
-        return output
+        return self.network(input)
 
 
 class Discriminator(nn.Module):

@@ -45,11 +45,11 @@ def df_preparation(df, subset="train", DEBUG=False):
     df["day"] = df["id"].apply(lambda x: int(x.split("_")[1].replace("day", "")))
     df["slice"] = df["id"].apply(lambda x: x.split("_")[3])
 
-    if (subset == "train") or (DEBUG):
-        DIR = TRAIN_ROOT_DIR + "train"
-    else:
-        DIR = TEST_ROOT_DIR
-
+    DIR = (
+        TRAIN_ROOT_DIR + "train"
+        if (subset == "train") or (DEBUG)
+        else TEST_ROOT_DIR
+    )
     """Also another cool feature of `glob.glob`, if you want to avoid `/*/*/*` type of pattern( as not all datasets follows certain pattern hence we might not be able find how many `/` to use) you can use,
 
     glob.glob(`/kaggle/input/uw-madison-gi-tract-image-segmentation/train/**/*png', recursive=True) """
@@ -57,44 +57,25 @@ def df_preparation(df, subset="train", DEBUG=False):
     print("all_images length ", len(all_images))  # 38496
 
     x = all_images[0].rsplit("/", 4)[0]
-    # print('x ', x)
-    # ../../input/uw-madison-gi-tract-image-segmentation/train
-
-    # Now I need a column named 'path' holding the full path of all the images in this dataframe
-    # But I can not simply create them with the below kind of line
-    # df['path'] = all_images
-    # Because each image is repeated. And so if I do the above line directly I will get below error
-    # ValueError: Length of values (38496) does not match length of index (115488)
-    # So the solution is to create a temporary dataframe > then merge this temp dataframe with the original df > then delete the temp df
-
-    # To make a column which will have th full pathname of all the iamges
-    # Hence I have to build the full path name. Below is an example.
-    # '../../input/uw-madison-gi-tract-image-segmentation/train/case44/case44_day0/scans/slice_0085_266_266_1.50_1.50.png',
-    path_partial_list = []
-    for i in range(0, df.shape[0]):
-        path_partial_list.append(
-            os.path.join(
-                x,
-                "case" + str(df["case"].values[i]),
-                "case"
-                + str(df["case"].values[i])
-                + "_"
-                + "day"
-                + str(df["day"].values[i]),
-                "scans",
-                "slice_" + str(df["slice"].values[i]),
-            )
+    path_partial_list = [
+        os.path.join(
+            x,
+            "case" + str(df["case"].values[i]),
+            "case"
+            + str(df["case"].values[i])
+            + "_"
+            + "day"
+            + str(df["day"].values[i]),
+            "scans",
+            "slice_" + str(df["slice"].values[i]),
         )
+        for i in range(df.shape[0])
+    ]
     df["path_partial"] = path_partial_list
 
-    # Now creating another temp df and for that, first I need the list of all images upto the string "slice_num"
-    # print(str(all_images[4].rsplit("_",4)[0]))
-    # ../../input/uw-madison-gi-tract-image-segmentation/train/case44/case44_day0/scans/slice_0088
-
-    path_partial_list = []
-    for i in range(0, len(all_images)):
-        path_partial_list.append(str(all_images[i].rsplit("_", 4)[0]))
-
+    path_partial_list = [
+        str(all_images[i].rsplit("_", 4)[0]) for i in range(len(all_images))
+    ]
     tmp_df = pd.DataFrame()
     tmp_df["path_partial"] = path_partial_list
     tmp_df["path"] = all_images
@@ -160,7 +141,7 @@ def rle_encode(masked_image):
 
 def rle_decode(mask_rle, shape, color=1):
     s = mask_rle.split()
-    starts, length = [np.asarray(x, dtype=int) for x in (s[0:][::2], s[1:][::2])]
+    starts, length = [np.asarray(x, dtype=int) for x in (s[:][::2], s[1:][::2])]
     starts -= 1
     ends = starts + length
     img = np.zeros((shape[0] * shape[1], shape[2]), dtype=np.float32)
@@ -191,8 +172,7 @@ def dice_loss(y_true, y_pred):
 def iou_coef(y_true, y_pred, smooth):
     intersection = K.sum(K.abs(y_true, *y_pred), axis=[1, 2, 3])
     union = K.sum(y_true, [1, 2, 3] + K.sum(y_pred, [1, 2, 3])) - intersection
-    iou = K.mean((intersection) + smooth / (union + smooth), axis=0)
-    return iou
+    return K.mean((intersection) + smooth / (union + smooth), axis=0)
 
 
 def bce_dice_loss(y_true, y_pred):

@@ -71,10 +71,7 @@ class DataGenerator(tf.keras.utils.Sequence):
                     mask = utils.rle_decode(rles, shape=(h, w, 1))
                     mask = cv2.resize(mask, (128, 128))
                     y[i, :, :, k] = mask
-        if self.subset == "train":
-            return X, y
-        else:
-            return X
+        return (X, y) if self.subset == "train" else X
 
     def _load_grayscaled_img(self, img_path):
         img = cv2.imread(img_path, cv2.IMREAD_ANYDEPTH)

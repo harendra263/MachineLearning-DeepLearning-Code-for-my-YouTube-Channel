@@ -14,7 +14,7 @@ from utils import *
 from wgan import *
 
 
-cuda = True if torch.cuda.is_available() else False
+cuda = bool(torch.cuda.is_available())
 Tensor = torch.cuda.FloatTensor if cuda else torch.FloatTensor
 
 """ So generally both torch.Tensor and torch.cuda.Tensor are equivalent. You can do everything you like with them both.

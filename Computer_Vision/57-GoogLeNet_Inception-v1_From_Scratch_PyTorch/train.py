@@ -16,6 +16,8 @@ def train_model(model, train_loader, val_loader, criterion, optimizer):
 
     train_epoch_loss_history, val_epoch_loss_history = [], []
 
+    info = "[For Epoch {}/{}]: train-loss = {:0.5f} | train-acc = {:0.3f} | val-loss = {:0.5f} | val-acc = {:0.3f}"
+
     for epoch in range(EPOCHS):
 
         train_running_loss = 0
@@ -92,17 +94,13 @@ def train_model(model, train_loader, val_loader, criterion, optimizer):
             val_epoch_loss_history.append(val_loss)
             val_acc = correct_val / val_samples_num
 
-        info = "[For Epoch {}/{}]: train-loss = {:0.5f} | train-acc = {:0.3f} | val-loss = {:0.5f} | val-acc = {:0.3f}"
-
         print(
             info.format(
                 epoch + 1, EPOCHS, train_epoch_loss, train_acc, val_loss, val_acc
             )
         )
 
-        torch.save(
-            model.state_dict(), "/content/sample_data/checkpoint{}".format(epoch + 1)
-        )
+        torch.save(model.state_dict(), f"/content/sample_data/checkpoint{epoch + 1}")
 
     torch.save(model.state_dict(), "/content/sample_data/googlenet_model")
 

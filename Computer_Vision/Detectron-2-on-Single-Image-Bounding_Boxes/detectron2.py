@@ -51,7 +51,7 @@ if __name__ == "__main__":
         result: VisImage = v.draw_instance_predictions(output.to("cpu"))
         processed_img: np.ndarray = result.get_image()[:, :, ::-1]
 
-        out_file_name: str = re.search(r"(.*)\.", img).group(0)[:-1]
+        out_file_name: str = re.search(r"(.*)\.", img)[0][:-1]
         out_file_name += "_post_detectron2.png"
 
         cv2.imwrite(out_file_name, processed_img)

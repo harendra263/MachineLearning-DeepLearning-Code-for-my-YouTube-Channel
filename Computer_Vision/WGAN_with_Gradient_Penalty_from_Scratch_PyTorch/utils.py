@@ -46,14 +46,14 @@ def make_grad_hook():
     def grad_hook(m):
         """isinstance(object, type)
         The isinstance() function returns True if the specified object is of the specified type, otherwise False."""
-        if isinstance(m, nn.Conv2d) or isinstance(m, nn.ConvTranspose2d):
+        if isinstance(m, (nn.Conv2d, nn.ConvTranspose2d)):
             gradients_list.append(m.weight.grad)
 
     return gradients_list, grad_hook
 
 
 def weights_init(m):
-    if isinstance(m, nn.Conv2d) or isinstance(m, nn.ConvTranspose2d):
+    if isinstance(m, (nn.Conv2d, nn.ConvTranspose2d)):
         torch.nn.init.normal_(m.weight, 0.0, 0.02)
     if isinstance(m, nn.BatchNorm2d):
         torch.nn.init.normal_(m.weight, 0.0, 0.02)
@@ -79,8 +79,7 @@ It tries to maximize the discriminator's output for its fake instances. In these
 
 
 def get_gen_loss(critic_fake_prediction):
-    gen_loss = -1.0 * torch.mean(critic_fake_prediction)
-    return gen_loss
+    return -1.0 * torch.mean(critic_fake_prediction)
 
 
 # UNIT TEST of Generator Loss Calculation
@@ -107,10 +106,11 @@ def get_crit_loss(critic_fake_prediction, crit_real_pred, gp, c_lambda):
     i.e. -D(real_imgs) + D(G(real_imgs))
     i.e. -D(real_imgs) + D(fake_imgs)
     """
-    crit_loss = (
-        torch.mean(critic_fake_prediction) - torch.mean(crit_real_pred) + c_lambda * gp
+    return (
+        torch.mean(critic_fake_prediction)
+        - torch.mean(crit_real_pred)
+        + c_lambda * gp
     )
-    return crit_loss
 
 
 # UNIT TEST of Critic Loss Calculation

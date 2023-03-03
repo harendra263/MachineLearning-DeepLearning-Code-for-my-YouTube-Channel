@@ -26,11 +26,9 @@ def get_data_loader(batch_size):
         download=True,
     )
 
-    # Data Loader
-    train_loader = torch.utils.data.DataLoader(
+    return torch.utils.data.DataLoader(
         dataset=train_dataset, batch_size=batch_size, shuffle=True
     )
-    return train_loader
 
 
 def plot_images(epoch, path, num_test_samples, generator, device):
@@ -61,6 +59,6 @@ def plot_images(epoch, path, num_test_samples, generator, device):
             cmap="Greys",
         )
 
-    label = "Epoch_{}".format(epoch + 1)
+    label = f"Epoch_{epoch + 1}"
     fig.text(0.5, 0.04, label, ha="center")
     fig.suptitle(title)

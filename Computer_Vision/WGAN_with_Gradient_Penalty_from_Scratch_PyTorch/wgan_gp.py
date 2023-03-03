@@ -42,21 +42,22 @@ class Generator(nn.Module):
                       (affects activation and batchnorm)
         """
 
-        if not final_layer:
-            return nn.Sequential(
+        return (
+            nn.Sequential(
+                nn.ConvTranspose2d(
+                    input_channels, output_channels, kernel_size, stride
+                ),
+                nn.Tanh(),
+            )
+            if final_layer
+            else nn.Sequential(
                 nn.ConvTranspose2d(
                     input_channels, output_channels, kernel_size, stride
                 ),
                 nn.BatchNorm2d(output_channels),
                 nn.ReLU(inplace=True),
             )
-        else:
-            return nn.Sequential(
-                nn.ConvTranspose2d(
-                    input_channels, output_channels, kernel_size, stride
-                ),
-                nn.Tanh(),
-            )
+        )
 
     def forward(self, noise):
         x = noise.view(len(noise), self.z_dim, 1, 1)
@@ -86,16 +87,17 @@ class Critic(nn.Module):
         final_layer=False,
     ):
 
-        if not final_layer:
-            return nn.Sequential(
+        return (
+            nn.Sequential(
+                nn.Conv2d(input_channels, output_channels, kernel_size, stride),
+            )
+            if final_layer
+            else nn.Sequential(
                 nn.Conv2d(input_channels, output_channels, kernel_size, stride),
                 nn.BatchNorm2d(output_channels),
                 nn.LeakyReLU(0.2, inplace=True),
             )
-        else:
-            return nn.Sequential(
-                nn.Conv2d(input_channels, output_channels, kernel_size, stride),
-            )
+        )
 
     def forward(self, image):
         crit_pred = self.critic(image)

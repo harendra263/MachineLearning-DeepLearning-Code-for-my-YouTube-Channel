@@ -42,7 +42,7 @@ We also need to detach a tensor when we need to move the tensor from GPU to CPU.
 
 
 def weights_init(m):
-    if isinstance(m, nn.Conv2d) or isinstance(m, nn.ConvTranspose2d):
+    if isinstance(m, (nn.Conv2d, nn.ConvTranspose2d)):
         torch.nn.init.normal_(m.weight, 0.0, 0.02)
     if isinstance(m, nn.BatchNorm2d):
         torch.nn.init.normal_(m.weight, 0.0, 0.02)
@@ -73,8 +73,7 @@ F.one_hot(x, num_classes=6)
 
 
 def concat_vectors(x, y):
-    combined = torch.cat((x.float(), y.float()), 1)
-    return combined
+    return torch.cat((x.float(), y.float()), 1)
 
 
 def calculate_input_dim(z_dim, mnist_shape, n_classes):

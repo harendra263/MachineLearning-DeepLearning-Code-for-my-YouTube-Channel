@@ -62,14 +62,13 @@ def gradient_of_critic_score(critic, real, fake, epsilon):
 
     mixed_scores = critic(interpolated_images)
 
-    gradient = torch.autograd.grad(
+    return torch.autograd.grad(
         inputs=interpolated_images,
         outputs=mixed_scores,
         grad_outputs=torch.ones_like(mixed_scores),
         create_graph=True,
         retain_graph=True,
     )[0]
-    return gradient
 
 
 ###############################################################################
@@ -112,9 +111,7 @@ def gradient_penalty_l2_norm(gradient):
 
     gradient_norm = gradient.norm(2, dim=1)
 
-    penalty = torch.mean((gradient_norm - 1) ** 2)
-
-    return penalty
+    return torch.mean((gradient_norm - 1) ** 2)
 
 
 ###############################################################################
@@ -158,7 +155,7 @@ import matplotlib.pyplot as plt
 current_step = 0
 generator_losses = []
 critic_losses_across_critic_repeats = []
-for epoch in range(n_epochs):
+for _ in range(n_epochs):
     # Dataloader returns the batches
     for real, _ in tqdm(dataloader):
         cur_batch_size = len(real)

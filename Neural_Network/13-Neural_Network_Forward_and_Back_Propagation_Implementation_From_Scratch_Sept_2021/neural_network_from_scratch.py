@@ -21,10 +21,7 @@ def forward_propagation(inputs, outputs, weights):
     # output value
     output_value = np.dot(hidden_value_post_activation, weights[2]) + weights[3]
 
-    # mse
-    mean_squared_error = np.mean(np.square(output_value - outputs))
-
-    return mean_squared_error
+    return np.mean(np.square(output_value - outputs))
 
 
 def train_weights_gradient_descent(inputs, outputs, weights, lr):
@@ -95,7 +92,7 @@ losses = []
 # each epoch I take the loss for that epoch and append to an array
 # Note the train_weights function returns updated_weights and the original_loss for the respective epoch
 
-for epoch in range(100):
+for _ in range(100):
     # Note for each consecutive epoch I am passing the updated weights
     # from previous epoch
     weights, loss_org = train_weights_gradient_descent(x, y, weights, 0.01)
